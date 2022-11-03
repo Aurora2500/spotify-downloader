@@ -2,6 +2,7 @@ package es.ulpgc.spotify.downloader;
 
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,11 +29,12 @@ public class Main {
     }
 
     private static List<String> getArtistsFromResource() throws IOException {
-        return new String(
-                Main.class
-                        .getResourceAsStream("/artists.txt")
-                        .readAllBytes()
-            ).lines()
-                .collect(Collectors.toList());
+        InputStream artistStream = Main.class.getResourceAsStream("/artists.txt");
+        try(artistStream) {
+            assert artistStream != null;
+            return new String(artistStream.readAllBytes())
+                    .lines()
+                    .collect(Collectors.toList());
+        }
     }
 }
