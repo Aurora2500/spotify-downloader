@@ -40,7 +40,7 @@ public class SpotifyAuthorization {
     private static String responseOf(HttpRequest request) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != HTTP_OK) throw new Exception(" Http response error " + response.statusCode());
+        if (response.statusCode() != HTTP_OK) throw new Exception(" Http response error " + response.statusCode() + " " + response.body());
         return response.body();
     }
 

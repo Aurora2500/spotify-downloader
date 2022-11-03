@@ -18,6 +18,8 @@ public class SpotifyAccessor {
     private final HttpClient client;
     private SpotifyAuthorization.Token authorization;
 
+    private int request_count = 0;
+
     public SpotifyAccessor() throws Exception {
         client = HttpClient.newHttpClient();
         authorization = SpotifyAuthorization.get();
@@ -29,12 +31,18 @@ public class SpotifyAccessor {
         authorization = SpotifyAuthorization.get();
     }
 
+    public int count() {
+        return request_count;
+    }
+
     public String get(String path, Map<String, String> params) throws Exception {
+        request_count += 1;
         return responseOf(request(path, params).GET().build());
     }
 
     private HttpRequest.Builder request(String path, Map<String, String> queryParams) throws Exception {
         checkAuthorization();
+        System.out.println("Requesting " + path + with(queryParams));
         return HttpRequest.newBuilder()
                 .uri(URI.create(API_BASE_URI + path + with(queryParams)))
                 .header("Authorization", authorization.token_type + " " + authorization.access_token)
@@ -58,7 +66,7 @@ public class SpotifyAccessor {
 
     private String responseOf(HttpRequest request) throws Exception {
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() != HTTP_OK) throw new Exception(" Http response error " + response.statusCode());
+        if (response.statusCode() != HTTP_OK) throw new Exception(" Http response error " + response.statusCode() + " " + response.body());
         return response.body();
     }
 }
