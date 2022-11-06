@@ -10,15 +10,15 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         List<String> artists = getArtistsFromResource();
-        //Store store = new DatabaseStore("jdbc:sqlite:spotify.db");
+        Store store = new DatabaseStore("jdbc:sqlite:spotify.db");
         SpotifyAccessor spotify = new SpotifyAccessor();
         SpotifyGraphGenerator wrapper = new SpotifyGraphGenerator(spotify);
 
         long startTime = System.currentTimeMillis();
 
         SpotifyGraph graph = wrapper.generateGraph(artists);
-        //store.saveGraph(graph);
-        //store.close();
+        store.saveGraph(graph);
+        store.close();
 
         long endTime = System.currentTimeMillis();
 
