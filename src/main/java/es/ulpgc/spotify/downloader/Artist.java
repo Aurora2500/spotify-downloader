@@ -1,7 +1,7 @@
 package es.ulpgc.spotify.downloader;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Artist {
     private final String id;
@@ -9,16 +9,16 @@ public class Artist {
     private final int followers;
     private final int popularity;
 
-    private final List<String> albums;
-    private final List<String> tracks;
+    private final Set<String> albums;
+    private final Set<String> tracks;
 
     public Artist(String id, String name, int followers, int popularity) {
         this.id = id;
         this.name = name;
         this.followers = followers;
         this.popularity = popularity;
-        this.albums = new ArrayList<>();
-        this.tracks = new ArrayList<>();
+        this.albums = new HashSet<>();
+        this.tracks = new HashSet<>();
     }
 
     public String id() {
@@ -37,11 +37,11 @@ public class Artist {
         return popularity;
     }
 
-    public List<String> albums() {
+    public Set<String> albums() {
         return albums;
     }
 
-    public List<String> tracks() {
+    public Set<String> tracks() {
         return tracks;
     }
 }

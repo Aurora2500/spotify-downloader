@@ -5,6 +5,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonObject;
 
+import java.util.HashSet;
+import java.util.Set;
+
 public final class SpotifyGson {
 	private static Gson instance = null;
 
@@ -44,7 +47,9 @@ public final class SpotifyGson {
 			int duration = jsonObject.get("duration_ms").getAsInt();
 			boolean explicit = jsonObject.get("explicit").getAsBoolean();
 			String album = jsonObject.get("album").getAsJsonObject().get("id").getAsString();
-			return new Track(id, name, duration, explicit, album);
+			Set<String> artists = new HashSet<>();
+			jsonObject.get("artists").getAsJsonArray().forEach(item -> artists.add(item.getAsJsonObject().get("id").getAsString()));
+			return new Track(id, name, duration, explicit, artists, album);
 		});
 
 		return builder.create();
