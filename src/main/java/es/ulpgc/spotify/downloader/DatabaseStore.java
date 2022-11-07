@@ -1,13 +1,10 @@
 package es.ulpgc.spotify.downloader;
 
+import io.reactivex.rxjava3.core.Observer;
+
 import java.sql.*;
 
 public class DatabaseStore implements Store {
-    private static final String INSERT_ARTISTS = "INSERT INTO artists (id, name, followers, popularity) VALUES (?, ?, ?, ?)";
-    private static final String INSERT_ALBUMS = "INSERT INTO albums (id, title, release_date, release_date_precision, type) VALUES (?, ?, ?, ?, ?)";
-    private static final String INSERT_TRACKS = "INSERT INTO tracks (id, title, album_id, duration, explicit, popularity) VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String INSERT_ARTIST_ALBUMS = "INSERT INTO artists_albums (artist_id, album_id) VALUES (?, ?)";
-    private static final String INSERT_ARTIST_TRACKS = "INSERT INTO artists_tracks (artist_id, track_id) VALUES (?, ?)";
 
     private final Connection connection;
 
@@ -55,7 +52,7 @@ public class DatabaseStore implements Store {
                 ")");
     }
 
-    public void saveGraph(SpotifyGraph graph) throws SQLException {
+    /* public void saveGraph(SpotifyGraph graph) throws SQLException {
         connection.setAutoCommit(false);
         System.out.println("Saving artists...");
         PreparedStatement insertArtistStatement = connection.prepareStatement(INSERT_ARTISTS);
@@ -104,6 +101,10 @@ public class DatabaseStore implements Store {
         insertArtistTrackStatement.executeBatch();
         connection.commit();
         connection.setAutoCommit(true);
+    } */
+
+    public DatabaseStoreVisitor getVisitor() {
+        return new DatabaseStoreVisitor(this.connection);
     }
 
     public void close() throws SQLException {

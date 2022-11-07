@@ -46,10 +46,11 @@ public final class SpotifyGson {
 			String name = jsonObject.get("name").getAsString();
 			int duration = jsonObject.get("duration_ms").getAsInt();
 			boolean explicit = jsonObject.get("explicit").getAsBoolean();
+			int popularity = jsonObject.get("popularity").getAsInt();
 			String album = jsonObject.get("album").getAsJsonObject().get("id").getAsString();
 			Set<String> artists = new HashSet<>();
 			jsonObject.get("artists").getAsJsonArray().forEach(item -> artists.add(item.getAsJsonObject().get("id").getAsString()));
-			return new Track(id, name, duration, explicit, artists, album);
+			return new Track(id, name, duration, explicit, popularity, artists, album);
 		});
 
 		return builder.create();

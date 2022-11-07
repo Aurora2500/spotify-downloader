@@ -3,7 +3,7 @@ package es.ulpgc.spotify.downloader;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Artist {
+public class Artist implements SpotifyGraphFragment {
     private final String id;
     private final String name;
     private final int followers;
@@ -43,5 +43,10 @@ public class Artist {
 
     public Set<String> tracks() {
         return tracks;
+    }
+
+    @Override
+    public void accept(StoreVisitor visitor) throws Exception {
+        visitor.visit(this);
     }
 }
