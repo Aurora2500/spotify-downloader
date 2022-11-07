@@ -21,6 +21,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="project" />
+        <module name="spotify-downloader" />
         <module name="spotify" />
       </profile>
     </annotationProcessing>

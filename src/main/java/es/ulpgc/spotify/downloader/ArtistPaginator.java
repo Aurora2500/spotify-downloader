@@ -8,8 +8,8 @@ import com.google.gson.reflect.TypeToken;
 import java.util.List;
 
 public class ArtistPaginator extends ListPaginator<Artist> {
-	public ArtistPaginator(SpotifyAccessor spotify, List<String> ids) {
-		super(spotify, "/artists", 50, ids);
+	public ArtistPaginator(List<String> ids) {
+		super("/artists", 50, ids);
 	}
 
 	@Override

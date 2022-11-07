@@ -1,5 +1,7 @@
 package es.ulpgc.spotify.downloader;
 
+import io.reactivex.rxjava3.core.Observable;
+
 import java.util.Map;
 
 public abstract class NumberPaginator<T> extends Paginator<T>{
@@ -12,7 +14,7 @@ public abstract class NumberPaginator<T> extends Paginator<T>{
 		}
 
 		@Override
-		protected String getNextResponse(int offset, int limit) throws Exception {
+		protected Observable<String> getNextResponse(int offset, int limit) throws Exception {
 			return spotify.get(endpoint, Map.of("limit", String.valueOf(limit), "offset", String.valueOf(offset)));
 		}
 }

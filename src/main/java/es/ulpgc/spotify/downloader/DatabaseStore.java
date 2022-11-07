@@ -107,6 +107,28 @@ public class DatabaseStore implements Store {
         return new DatabaseStoreVisitor(this.connection);
     }
 
+    static class Size {
+        public int artists;
+        public int albums;
+        public int tracks;
+
+        public Size(int artists, int albums, int tracks) {
+            this.artists = artists;
+            this.albums = albums;
+            this.tracks = tracks;
+        }
+    }
+
+    public Size getSize() throws SQLException {
+        Statement statement = connection.createStatement();
+        ResultSet resultSet = statement.executeQuery("SELECT (SELECT COUNT(*) FROM artists), (SELECT COUNT(*) FROM albums), (SELECT COUNT(*) FROM tracks)");
+        resultSet.next();
+        int artists = resultSet.getInt(1);
+        int albums = resultSet.getInt(2);
+        int tracks = resultSet.getInt(3);
+        return new Size(artists, albums, tracks);
+    }
+
     public void close() throws SQLException {
         connection.close();
     }

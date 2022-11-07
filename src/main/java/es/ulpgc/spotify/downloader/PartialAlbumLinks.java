@@ -23,7 +23,7 @@ public class PartialAlbumLinks {
         return id;
     }
 
-    public AlbumLinks generate(SpotifyAccessor spotify, Collection<String> artists) throws Exception {
+    /* public AlbumLinks generate(SpotifyAccessor spotify, Collection<String> artists) throws Exception {
         artistIds.retainAll(artists);
         if (trackSize > 50) {
             AlbumsTracksPaginator paginator = new AlbumsTracksPaginator(spotify, id, trackIds.size(), trackSize);
@@ -33,5 +33,5 @@ public class PartialAlbumLinks {
             }
         }
         return new AlbumLinks(id, artistIds, trackIds);
-    }
+    } */
 }

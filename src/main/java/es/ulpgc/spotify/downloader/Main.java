@@ -10,23 +10,25 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         List<String> artists = getArtistsFromResource();
-        Store store = new DatabaseStore("jdbc:sqlite:spotify.db");
-        SpotifyAccessor spotify = new SpotifyAccessor();
-        SpotifyGraphGenerator wrapper = new SpotifyGraphGenerator(spotify);
+        DatabaseStore store = new DatabaseStore("jdbc:sqlite:spotify.db");
 
         long startTime = System.currentTimeMillis();
 
-        SpotifyGraph graph = wrapper.generateGraph(artists);
+        SpotifyGraphGenerator.generateGraph(artists).subscribe(store.getVisitor());
+
+        //SpotifyGraph graph = wrapper.generateGraph(artists);
         //store.saveGraph(graph);
-        store.close();
 
         long endTime = System.currentTimeMillis();
 
-        System.out.println("Saved " + graph.artists().size() + " artists, "
-                + graph.albums().size() + " albums and "
-                + graph.tracks().size() + " tracks with "
-                + spotify.count() + " request(s) in "
+        DatabaseStore.Size size = store.getSize();
+        System.out.println("Saved " + size.artists + " artists, "
+                + size.albums + " albums and "
+                + size.tracks + " tracks with "
+                + SpotifyAccessor.getInstance().count() + " request(s) in "
                 + (endTime - startTime) + "ms");
+
+        store.close();
     }
 
     private static List<String> getArtistsFromResource() throws IOException {

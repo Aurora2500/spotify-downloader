@@ -1,20 +1,26 @@
 package es.ulpgc.spotify.downloader;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import io.reactivex.rxjava3.annotations.NonNull;
+import io.reactivex.rxjava3.core.Observable;
+
 import java.util.List;
-import java.util.Set;
 
 public class SpotifyGraphGenerator {
-	private final SpotifyAccessor accessor;
 
-	public SpotifyGraphGenerator(SpotifyAccessor accessor) {
-		this.accessor = accessor;
+	public static @NonNull Observable<SpotifyGraphFragment> generateGraph(List<String> id) {
+		Observable<Artist> artist = Observable.just(new Artist(id, "name", 0, 0));
+
+		return null;
 	}
 
-	public SpotifyGraph generateGraph(List<String> artists) throws Exception {
+	private static Observable<Artist> artists(List<String> ids) {
+		return ;
+	}
+
+
+	/*public SpotifyGraph generateGraph(List<String> artists) throws Exception {
 		SpotifyGraph graph = new SpotifyGraph();
-		Paginator<Artist> artistPaginator = new ArtistPaginator(accessor, artists);
+		Paginator<Artist> artistPaginator = new ArtistPaginator(artists);
 		while (artistPaginator.hasNext()) {
 			List<Artist> artistList = artistPaginator.next();
 			for (Artist artist : artistList) {
@@ -59,5 +65,5 @@ public class SpotifyGraphGenerator {
 			}
 		}
 		return graph;
-	}
+	}*/
 }
