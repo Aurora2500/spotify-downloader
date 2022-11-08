@@ -6,8 +6,8 @@ public class DatabaseStore implements Store {
 
     private final Connection connection;
 
-    public DatabaseStore(String uri) throws SQLException {
-        connection = DriverManager.getConnection(uri);
+    public DatabaseStore(String path) throws SQLException {
+        connection = DriverManager.getConnection("jdbc:sqlite:" + path);
         assertTables();
     }
 

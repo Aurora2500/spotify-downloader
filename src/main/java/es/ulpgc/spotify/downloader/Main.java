@@ -9,8 +9,13 @@ import java.util.stream.Collectors;
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        if(args.length < 1) {
+            System.err.println("No database file specified");
+            System.err.println("Usage: java -jar spotify-downloader.jar <database-path>");
+            System.exit(1);
+        }
         List<String> artists = getArtistsFromResource();
-        DatabaseStore store = new DatabaseStore("jdbc:sqlite:spotify.db");
+        DatabaseStore store = new DatabaseStore(args[0]);
 
         long startTime = System.currentTimeMillis();
 
