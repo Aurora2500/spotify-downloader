@@ -14,10 +14,7 @@ public class Main {
 
         long startTime = System.currentTimeMillis();
 
-        SpotifyGraphGenerator.generateGraph(artists).subscribe(store.getVisitor());
-
-        //SpotifyGraph graph = wrapper.generateGraph(artists);
-        //store.saveGraph(graph);
+        SpotifyGraphGenerator.generateGraph(artists).blockingSubscribe(store.getVisitor());
 
         long endTime = System.currentTimeMillis();
 

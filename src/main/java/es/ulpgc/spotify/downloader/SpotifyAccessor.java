@@ -2,6 +2,7 @@ package es.ulpgc.spotify.downloader;
 
 
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -97,6 +98,7 @@ public class SpotifyAccessor {
                 } else {
                     return Observable.error(new Exception("Request failed with status code " + r.statusCode()));
                 }
-            });
+                // here's where the concurrency magic happens.
+            }).flatMap(data -> Observable.just(data).subscribeOn(Schedulers.io()), 512);
     }
 }
