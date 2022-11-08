@@ -1,14 +1,16 @@
 package es.ulpgc.spotify.downloader;
 
+import io.reactivex.rxjava3.core.Observable;
+
 import java.util.Collection;
 import java.util.Objects;
 
 public class AlbumLinks {
     private final String id;
     private final Collection<String> artistIds;
-    private final Collection<String> trackIds;
+    private final Observable<String> trackIds;
 
-    public AlbumLinks(String id, Collection<String> authorIds, Collection<String> trackIds) {
+    public AlbumLinks(String id, Collection<String> authorIds, Observable<String> trackIds) {
         this.id = id;
         this.artistIds = authorIds;
         this.trackIds = trackIds;
@@ -22,7 +24,7 @@ public class AlbumLinks {
         return artistIds;
     }
 
-    public Collection<String> trackIds() {
+    public Observable<String> trackIds() {
         return trackIds;
     }
 

@@ -37,7 +37,12 @@ public class DatabaseStoreVisitor implements StoreVisitor {
 		preparedStatement.setString(3, album.releaseDate());
 		preparedStatement.setString(4, album.releaseDatePrecision());
 		preparedStatement.setString(5, album.type());
-		preparedStatement.execute();
+		try {
+			preparedStatement.execute();
+		} catch (SQLException e) {
+			System.out.println("Error inserting album: " + album.id());
+			throw e;
+		}
 		PreparedStatement insertArtistAlbumStatement = connection.prepareStatement(INSERT_ARTIST_ALBUMS);
 		for (String artistId : album.artists()) {
 			insertArtistAlbumStatement.setString(1, artistId);

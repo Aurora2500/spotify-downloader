@@ -11,7 +11,6 @@ public class Album implements SpotifyGraphFragment {
 	private final String type;
 
 	private final Set<String> artists;
-	private final Set<String> tracks;
 
 	public Album(String id, String title, String releaseDate, String releaseDatePrecision, String type) {
 		this.id = id;
@@ -21,7 +20,6 @@ public class Album implements SpotifyGraphFragment {
 		this.type = type;
 
 		artists = new HashSet<>();
-		tracks = new HashSet<>();
 	}
 
 	public String id() {
@@ -48,8 +46,17 @@ public class Album implements SpotifyGraphFragment {
 		return artists;
 	}
 
-	public Set<String> tracks() {
-		return tracks;
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Album) {
+			return id.equals(((Album) obj).id);
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
 	}
 
 	@Override

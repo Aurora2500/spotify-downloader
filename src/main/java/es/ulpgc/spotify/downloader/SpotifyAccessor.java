@@ -30,29 +30,37 @@ public class SpotifyAccessor {
         authorization = SpotifyAuthorization.get();
     }
 
-    public static SpotifyAccessor getInstance() throws Exception {
+    public static SpotifyAccessor getInstance() {
         if (instance == null) {
-            instance = new SpotifyAccessor();
+            try {
+                instance = new SpotifyAccessor();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
         return instance;
     }
 
-    private void checkAuthorization() throws Exception {
+    private void checkAuthorization() {
         if (authorization.isValid()) return;
         System.out.println("Token has expired. Requesting other...");
-        authorization = SpotifyAuthorization.get();
+        try {
+            authorization = SpotifyAuthorization.get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public int count() {
         return request_count;
     }
 
-    public Observable<String> get(String path, Map<String, String> params) throws Exception {
+    public Observable<String> get(String path, Map<String, String> params) {
         request_count += 1;
         return responseOf(request(path, params).GET().build());
     }
 
-    private HttpRequest.Builder request(String path, Map<String, String> queryParams) throws Exception {
+    private HttpRequest.Builder request(String path, Map<String, String> queryParams) {
         checkAuthorization();
         System.out.println("Requesting " + path + with(queryParams));
         return HttpRequest.newBuilder()
@@ -76,7 +84,7 @@ public class SpotifyAccessor {
         );
     }
 
-    private Observable<String> responseOf(HttpRequest request) throws Exception {
+    private Observable<String> responseOf(HttpRequest request) {
         CompletableFuture<HttpResponse<String>> response = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
         return Observable.fromFuture(response)
             .flatMap(r -> {
@@ -84,6 +92,7 @@ public class SpotifyAccessor {
                     return Observable.just(r.body());
                 } else if (r.statusCode() == 429) {
                     int retryAfter = Integer.parseInt(r.headers().firstValue("Retry-After").orElse("0"));
+                    System.out.println("Too many requests. Waiting "+ retryAfter +" second(s)...");
                     return Observable.timer(retryAfter, TimeUnit.SECONDS).flatMap(x -> responseOf(request));
                 } else {
                     return Observable.error(new Exception("Request failed with status code " + r.statusCode()));

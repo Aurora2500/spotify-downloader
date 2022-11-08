@@ -2,37 +2,36 @@ package es.ulpgc.spotify.downloader;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import io.reactivex.rxjava3.core.Observable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class AlbumPaginator extends ListPaginator<PartialAlbumLinks> {
 
-	public AlbumPaginator(SpotifyAccessor spotify, List<String> ids) {
-		super(spotify, "/albums", 20, ids);
+	public AlbumPaginator(Observable<String> ids) {
+		super("/albums", 20, ids);
 	}
 
 	@Override
-	protected List<PartialAlbumLinks> interpretResponse(String response) {
+	protected Observable<PartialAlbumLinks> interpretResponse(String response) {
 		JsonObject object = SpotifyGson.getInstance().fromJson(response, JsonObject.class);
-		JsonArray albums = object.getAsJsonArray("albums");
-		List<PartialAlbumLinks> al = new ArrayList<>();
-		albums.forEach(item -> {
-			JsonObject album = item.getAsJsonObject();
-			String id = album.get("id").getAsString();
-			List<String> authors = new ArrayList<>();
-			album.getAsJsonArray("artists").forEach(artist -> {
-				String artistId = artist.getAsJsonObject().get("id").getAsString();
-				authors.add(artistId);
-			});
-			int trackNumber = album.get("total_tracks").getAsInt();
+		JsonArray items = object.getAsJsonArray("albums");
+		List<PartialAlbumLinks> albums = new ArrayList<>();
+		items.forEach(item -> {
+			JsonObject itemObject = item.getAsJsonObject();
+			String id = itemObject.get("id").getAsString();
+			List<String> artists = new ArrayList<>();
+			itemObject.get("artists").getAsJsonArray().forEach(artist -> artists.add(artist.getAsJsonObject().get("id").getAsString()) );
+			int totalTracks = itemObject.get("total_tracks").getAsInt();
 			List<String> tracks = new ArrayList<>();
-			album.getAsJsonObject("tracks").getAsJsonArray("items").forEach(track -> {
-				String trackId = track.getAsJsonObject().get("id").getAsString();
-				tracks.add(trackId);
-			});
-			al.add(new PartialAlbumLinks(id, authors, tracks, trackNumber));
+			itemObject.getAsJsonObject("tracks").getAsJsonArray("items").forEach(track -> tracks.add(track.getAsJsonObject().get("id").getAsString()) );
+			Observable<String> trackIds = Observable.fromIterable(tracks);
+			if(tracks.size() < totalTracks) {
+				trackIds = trackIds.concatWith(new AlbumsTracksPaginator(id, tracks.size(), totalTracks).get());
+			}
+			albums.add(new PartialAlbumLinks(id, artists, trackIds));
 		});
-		return al;
+		return Observable.fromIterable(albums);
 	}
 }
