@@ -35,7 +35,7 @@ public final class SpotifyGson {
 			String id = jsonObject.get("id").getAsString();
 			String name = jsonObject.get("name").getAsString();
 			String releaseDate = jsonObject.get("release_date").getAsString();
-			String releaseDatePrecision = jsonObject.get("release_date").getAsString();
+			String releaseDatePrecision = jsonObject.get("release_date_precision").getAsString();
 			String type = jsonObject.get("type").getAsString();
 			return new Album(id, name, releaseDate, releaseDatePrecision, type);
 		});
