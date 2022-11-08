@@ -29,7 +29,7 @@ public class Main {
     }
 
     private static List<String> getArtistsFromResource() throws IOException {
-        InputStream artistStream = Main.class.getResourceAsStream("/short.txt");
+        InputStream artistStream = Main.class.getResourceAsStream("/artists.txt");
         try(artistStream) {
             assert artistStream != null;
             return new String(artistStream.readAllBytes())
