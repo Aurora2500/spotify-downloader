@@ -18,9 +18,6 @@ public class PartialAlbumLinks {
         this.trackIds = trackIds;
     }
 
-    public String id() {
-        return id;
-    }
     public AlbumLinks generate(Collection<String> artists) {
         artistIds.retainAll(artists);
 

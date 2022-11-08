@@ -13,7 +13,7 @@ public class DatabaseStoreVisitor implements StoreVisitor {
 	private static final String INSERT_TRACKS = "INSERT INTO tracks (id, title, album_id, duration, explicit, popularity) VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String INSERT_ARTIST_ALBUMS = "INSERT INTO artists_albums (artist_id, album_id) VALUES (?, ?)";
 	private static final String INSERT_ARTIST_TRACKS = "INSERT INTO artists_tracks (artist_id, track_id) VALUES (?, ?)";
-	Connection connection;
+	private final Connection connection;
 	public DatabaseStoreVisitor(Connection connection) {
 		this.connection = connection;
 	}
