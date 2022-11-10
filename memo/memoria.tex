@@ -1,0 +1,217 @@
+\documentclass{article}
+\usepackage[spanish]{babel}
+\usepackage{authblk}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+
+\usepackage[
+	backend=biber,
+	style=numeric,
+]{biblatex}
+
+\usepackage{enumitem}
+\usepackage{extarrows}
+\usepackage{mathtools}
+\usepackage{systeme}
+\usepackage{graphicx}
+\usepackage{float}
+
+\usepackage{multirow}
+\usepackage{minted}
+
+\graphicspath{ {./img/} }
+
+\addbibresource{./sources.bib}
+
+\newcommand{\cimg}[2]{
+\begin{figure}[H]
+	\center
+		\includegraphics[width=#2\linewidth]{#1}
+\end{figure}
+}
+
+\begin{document}
+
+\begin{titlepage}
+	\centering
+	{\huge\bfseries Spotify Downloader -- Memoria\par}
+	\vspace{3cm}
+	{\scshape\large Desarollo de Applicaciones para Ciencia de Datos\par}
+	\vspace{1cm}
+	{\scshape\large Grado en Ciencias e Ingeniería de Datos\par}
+	\vspace{1cm}
+	{\scshape\large Escuela de Ingeniería Informática\par}
+	\vspace{1cm}
+	{\scshape\large Universidad de Las Palmas de Gran Canaria\par}
+\end{titlepage}
+
+\newpage
+
+\begin{abstract}
+
+Spotify Downloader es un programa capaz de acceder al API REST de Spotify,
+obtener datos sobre artistas, albums, y canciones, y guardarlos en una base de datos.
+Dado la naturaleza IO del problema, es obvio de que el límite de la aplicación será 
+lo rápido de que puede realizar peticiones.
+Por esto el programa esta diseñado de forma de que el acceso a la API sea concurrente, mandando los valores que obtiene
+a la base de datos a medida que las peticiones se completan.
+
+Esta concurrencia se obtiene con el uso de ReactiveX\cite{rx}, más concretamente, con la librería de Java \textbf{RxJava}.
+Esta librería proporciona la clase \mintinline{java}{Observer<T>} y \mintinline{java}{Observable<T>}.
+En el que \mintinline{java}{Observable<T>} representa una corriente asíncrona
+de valores con una interfaz monádica, permitiendo una manera sencilla de manipular y combinar estas.
+
+\end{abstract}
+
+\newpage
+
+\tableofcontents
+
+\newpage
+
+\section{Recursos utilizados}
+
+Los siguientes recursos se utilizaron para la realización del proyecto:
+
+\begin{itemize}
+	\item El IDE usado es \textbf{IntelliJ IDEA}\cite{ij}
+	\item Para la versión de control se utilizó \textbf{git} con \textbf{GitHub}
+	\item Para la escritura de la memoria, se utilizó \LaTeX{}
+	\item Para los diagramas de clase se utilizó \textbf{StarUML}
+\end{itemize}
+
+\section{Diseño}
+
+\subsection{Observables}
+
+Una gran parte de este programa está centrado sobre los observables.
+Estos se pueden pensar como si fuesen una combinación de futuros e iterables.
+Un iterable decora un típo \mintinline{java}{T} de forma de que en vez de tener un único valor,
+se tiene una corriente de valores.
+Y un futuro decora un típo \mintinline{java}{T} de forma de que en vez de existir en la actualidad,
+es un valor de que vendrá en el futuro.
+De esta forma, un Observable decora a un tipo en ambas de estas formas.
+Un observable de un típo implica de que es una corriente de valores futuros.
+
+\begin{center}
+\begin{tabular}{cc|c|c|}
+	\cline{3-4}
+	& & \multicolumn{2}{c|}{Número} \\
+	\cline{3-4} 
+	& & Singular & Plural \\
+	\cline{1-4}
+	\multicolumn{1}{|c}{\multirow{2}{*}{Sincronisidad}} &
+	\multicolumn{1}{|c|}{Síncrono} & \mintinline{java}{T} & \mintinline{java}{Iterable<T>} \\
+	\cline{2-4}
+	\multicolumn{1}{|c}{} &
+	\multicolumn{1}{|c|}{Asíncrono} & \mintinline{java}{Future<T>} & \mintinline{java}{Observable<T>} \\
+	\cline{1-4}
+\end{tabular}
+\end{center}
+
+Además, dado que este objeto dispone de métodos como \mintinline{java}{just} y \mintinline{java}{flatMap},
+se pueden razonar sobre estos típos como si fuesen monadas, permitiendo una sencilla y elegante composición
+entre todos los diferentes observables que se pueden aparecer durante la ejecución del programa, sin tener que
+preocuparse por los detalles de los efectos secundarios que ocurren detras de estas.
+
+\subsection{Patrones de diseño}
+
+Se utilizan los siguientes patrones de diseño:
+
+\begin{itemize}
+	\item Singleton
+	\item Visitor
+	\item Template
+\end{itemize}
+
+\newpage
+
+\subsubsection{Singleton}
+
+Hay dos instancias en las que se utiliza el patrón de Singleton en el proyecto.
+
+Una de estas es para la creación de un Gson que tiene registrado deserializadores personalizados
+para las diferentes clases que sirven para modelar el dominio.
+
+La segunda aparición del patron de Singleton aparece en el uso de SpotifyAccesor.
+Esto se justifica con el hecho de que hace falta un tóken OAuth 2.0 para acceder a este,
+con lo que mantener el SpotifyAccesor detrás de un Singleton significa de que en cada momento solo habrá una única
+instancia que usa el token de acceso que devuelve Spotify al pasar por la autorización de OAuth 2.0.
+Además, la API de Spotify se accede desde varias partes del programa. De forma de que esto cancela la necesidad de pasar
+la instancia de SpotifyAccesor creada por todo el árbol de las clases a las clases que lo necesita.
+
+\cimg{singleton.png}{1}
+
+\newpage
+
+\subsubsection{Visitor}
+
+El hecho de guardar los datos obtenidos de la API de Spotify se realiza mediante un patrón de Visitor.
+
+Ya que el modelo está dividido entre autores, artistas y canciones,
+y además estos son pasados a la base de datos
+en cuanto sean generados, significa de que la base de datos tendrá
+que tratarlos individualmente.
+
+Para manejar esto se utiliza el patrón de Visitor.
+
+\cimg{visitor.png}{0.9}
+
+\newpage
+
+\subsubsection{Template}
+
+Para acceder el API de la forma más eficiente, se hace uso de los recursos paginados que tiene.
+
+Entre estos se pueden encontrar paginación con offset y limit, donde se pagina poniendo un offset y un limit;
+y paginación de listados, donde se pagina pasando todos los IDs en una lista.
+
+Para modelar estos endpoints del API, se usa un patrón de templado para generalizar las partes comunes que tienen
+estos puntos de acceso paginados.
+
+\cimg{template.png}{0.9}
+
+\newpage
+
+\section{Conclusiones}
+
+Dado la inexperiencia de la programación concurrente en Java de los autores del programa.
+A lo largo de su vida de desarollo primero se implementó de una forma completamente síncrona,
+tal que una vez funcione este prototípo, se siga desarollando para obtener la concurrencia.
+Por esta historia, y la gran diferencia de paradigmas usados en el cambio de la sincronisidad
+del programa, la versión final puede que tenga detalles que sobrarían si
+se hubiera tenido en cuenta desde el principio el paradigma que se usaría para el desarollo de la aplicación.
+
+En la actualidad, el problema más grande presente es la falta de una centralización en cuando al
+manejo del límite de peticiones, de forma de que si se llega al límite, todas las peticiones
+que se necesitan que realizar se van a ejecutar de forma que todas se ejecutarian de todos modos
+ignorando el hecho de que el límite ya está superado, solo descubriendo esto cuando la respuesta les indica
+esto. Una versión mejorada podría ser capaz de alentar peticiones aún no mandadas si se sabe de que el límite de
+peticiones se ha pasado.
+
+\section{Líneas futuras}
+
+Dado la baja iteractividad con un usuario que tiene la aplicación, no existe
+una obvia línea que tomar para comercializar el producto.
+A pesar de esto, el encapsulamiento y el bien rendimiento de la aplicación 
+pueden encontrarse a ser útiles para otras aplicaciones más centradas al usuario.
+De forma de que pueden existir una plétora de aplicaciones comerciales que usan los datos
+obtenidos de Spotify, tal que todas estas pueden usar este proyecto como un módulo integral
+para el funcionamiento de estas.
+
+Por lo que la mejor línea que puede tener este programa para poder comercializarse es
+desarollarse en una libreria bien diseñada y modular que se pueda integrar en otras aplicaciones comerciales.
+
+
+\printbibliography
+
+\begin{titlepage}
+	\centering
+	{\large\itshape Aurora Zuoris}
+	\vfill
+	La memoria se ha creado el \today{} con \LaTeX{}
+	\vfill
+	\today
+\end{titlepage}
+
+\end{document}

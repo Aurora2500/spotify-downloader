@@ -1,5 +1,5 @@
 package es.ulpgc.spotify.downloader;
 
 public interface SpotifyGraphFragment {
-	void accept(StoreVisitor store) throws Exception;
+	void accept(StoreVisitor visitor) throws Exception;
 }

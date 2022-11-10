@@ -60,7 +60,7 @@ public class Album implements SpotifyGraphFragment {
 	}
 
 	@Override
-	public void accept(StoreVisitor store) throws Exception {
-		store.visit(this);
+	public void  accept(StoreVisitor visitor) throws Exception {
+		visitor.visit(this);
 	}
 }
